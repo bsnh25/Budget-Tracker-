@@ -38,8 +38,11 @@ while IFS= read -r branch; do
     fi
 done < <(git branch)
 
-# Combine branches into a master selection menu
-all_branches=("${default_branches[@]}" "${existing_branches[@]}")
+# Combine branches into a master selection menu safely under set -u
+all_branches=("${default_branches[@]}")
+if [ ${#existing_branches[@]} -gt 0 ]; then
+    all_branches+=("${existing_branches[@]}")
+fi
 
 echo -e "${BLUE}👉 Choose target branch to push and deploy:${NC}"
 for i in "${!all_branches[@]}"; do
