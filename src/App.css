@@ -1,0 +1,7 @@
+/* Clear default Vite App.css to prevent conflicts with our index.css design system */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
