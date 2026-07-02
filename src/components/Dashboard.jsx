@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function Dashboard({ budget, openLogger }) {
+  const [showExplanation, setShowExplanation] = useState(false);
   const { 
     dateMetrics, 
     budgetMetrics, 
@@ -80,6 +81,25 @@ export default function Dashboard({ budget, openLogger }) {
                 ? `${t('pacingWarning')} ${t('elapsed')} ${elapsedPercent}%, spent ${Math.round((totalSpent / totalPlannedLimit) * 100)}%.`
                 : `${t('spendingOnTrack')} ${formatCurrency(totalSpent)} (${Math.round((totalSpent / totalPlannedLimit) * 100)}%) ${t('ofJointIncome')}.`}
             </p>
+            <button 
+              onClick={() => setShowExplanation(true)} 
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-secondary)',
+                fontSize: '0.75rem',
+                fontWeight: '600',
+                padding: '0',
+                marginTop: '0.4rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+                textDecoration: 'underline'
+              }}
+            >
+              ℹ️ {t('howIsThisCalculated')}
+            </button>
           </div>
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('projectedMonthEnd')}</div>
@@ -91,7 +111,7 @@ export default function Dashboard({ budget, openLogger }) {
       </div>
 
       {/* 3. Top Metrics Row */}
-      <div className="metrics-grid">
+      <div className="metrics-grid dashboard-metrics-grid">
         <div className="glass-panel glass-panel-interactive">
           <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{t('totalMonthlyLimit')}</div>
           <div style={{ fontSize: '1.8rem', fontWeight: '800', fontFamily: 'Outfit' }}>{formatCurrency(totalPlannedLimit)}</div>
@@ -124,7 +144,7 @@ export default function Dashboard({ budget, openLogger }) {
       </div>
 
       {/* 4. Main Grid: Category Progress Bars & Alerts */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem' }}>
+      <div className="dashboard-layout-grid" style={{ gap: '1.5rem' }}>
         
         {/* Progress Bars (Left Side) */}
         <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -274,6 +294,63 @@ export default function Dashboard({ budget, openLogger }) {
         </div>
 
       </div>
+
+      {showExplanation && (
+        <div className="modal-overlay" style={{ zIndex: 3000 }}>
+          <div className="modal-content" style={{ maxWidth: '600px', width: '92%', maxHeight: '85vh', overflowY: 'auto' }}>
+            <button className="modal-close" onClick={() => setShowExplanation(false)}>&times;</button>
+            
+            <h3 style={{ fontSize: '1.4rem', marginBottom: '1rem', fontFamily: 'Outfit', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {t('calcExplanationTitle')}
+            </h3>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', fontSize: '0.85rem', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
+              <p>{t('calcExplanationIntro')}</p>
+
+              <hr style={{ border: 'none', borderTop: '1px solid var(--glass-border)', margin: '0.25rem 0' }} />
+
+              <div>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 'bold', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <span>📈</span> {t('calcProjTitle')}
+                </h4>
+                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.6rem 0.75rem', borderRadius: '8px', fontFamily: 'monospace', fontSize: '0.75rem', color: 'var(--color-secondary)', marginBottom: '0.5rem', border: '1px solid var(--glass-border)' }}>
+                  {t('calcProjFormula')}
+                </div>
+                <p>{t('calcProjDesc')}</p>
+                
+                <div style={{ background: 'rgba(168, 85, 247, 0.08)', border: '1px dashed rgba(168, 85, 247, 0.3)', padding: '0.8rem', borderRadius: '10px', marginTop: '0.6rem' }}>
+                  <strong style={{ color: 'var(--color-primary)', display: 'block', marginBottom: '0.25rem' }}>{t('calcFixedExAnomaly')}</strong>
+                  <span style={{ fontSize: '0.8rem', lineHeight: '1.4' }}>{t('calcFixedExAnomalyDesc')}</span>
+                </div>
+              </div>
+
+              <hr style={{ border: 'none', borderTop: '1px solid var(--glass-border)', margin: '0.25rem 0' }} />
+
+              <div>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 'bold', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <span>⏱️</span> {t('calcPacingTitle')}
+                </h4>
+                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.6rem 0.75rem', borderRadius: '8px', fontFamily: 'monospace', fontSize: '0.75rem', color: 'var(--color-warning)', marginBottom: '0.5rem', border: '1px solid var(--glass-border)' }}>
+                  {t('calcPacingFormula')}
+                </div>
+                <p>{t('calcPacingDesc')}</p>
+
+                <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px dashed rgba(16, 185, 129, 0.3)', padding: '0.8rem', borderRadius: '10px', marginTop: '0.6rem' }}>
+                  <strong style={{ color: 'var(--color-success)', display: 'block', marginBottom: '0.25rem' }}>{t('calcPacingFriendlyTip')}</strong>
+                  <span style={{ fontSize: '0.8rem', lineHeight: '1.4' }}>{t('calcPacingFriendlyTipDesc')}</span>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+                <button className="btn btn-primary" onClick={() => setShowExplanation(false)}>
+                  {t('closeBtn')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -181,7 +181,7 @@ export default function Categories({ budget }) {
       </div>
 
       {/* 2. Top Allocation Donut & Joint Income Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '1.5rem', marginBottom: '2rem' }}>
+      <div className="categories-layout-grid" style={{ gap: '1.5rem', marginBottom: '2rem' }}>
         
         {/* Income Settings Panel */}
         <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', justifyGap: 'space-between' }}>

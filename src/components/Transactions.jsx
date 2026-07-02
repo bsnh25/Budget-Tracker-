@@ -156,75 +156,145 @@ export default function Transactions({ budget, isLoggerOpen, openLogger, closeLo
             </p>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="transaction-table">
-              <thead>
-                <tr>
-                  <th>{t('date')}</th>
-                  <th>{t('spender')}</th>
-                  <th>{t('category')}</th>
-                  <th>{t('notes')}</th>
-                  <th style={{ textAlign: 'right' }}>{t('amount')}</th>
-                  <th style={{ textAlign: 'center', width: '100px' }}>{t('actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredTransactions.map(tData => {
-                  const cat = categories.find(c => c.id === tData.categoryId);
-                  return (
-                    <tr key={tData.id}>
-                      <td style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{tData.date}</td>
-                      <td>
-                        <span className={`spender-badge ${tData.spender}`}>
-                          {tData.spender === 'me' ? '👨 ' + t('husband') : tData.spender === 'spouse' ? '👩 ' + t('wife') : '🤝 ' + t('familyView')}
-                        </span>
-                      </td>
-                      <td>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-primary)', fontWeight: 500 }}>
-                          <span>{cat?.icon || '📦'}</span>
+          <>
+            {/* Desktop Table View */}
+            <div className="transaction-table-wrapper" style={{ overflowX: 'auto' }}>
+              <table className="transaction-table">
+                <thead>
+                  <tr>
+                    <th>{t('date')}</th>
+                    <th>{t('spender')}</th>
+                    <th>{t('category')}</th>
+                    <th>{t('notes')}</th>
+                    <th style={{ textAlign: 'right' }}>{t('amount')}</th>
+                    <th style={{ textAlign: 'center', width: '100px' }}>{t('actions')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredTransactions.map(tData => {
+                    const cat = categories.find(c => c.id === tData.categoryId);
+                    return (
+                      <tr key={tData.id}>
+                        <td style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{tData.date}</td>
+                        <td>
+                          <span className={`spender-badge ${tData.spender}`}>
+                            {tData.spender === 'me' ? '👨 ' + t('husband') : tData.spender === 'spouse' ? '👩 ' + t('wife') : '🤝 ' + t('familyView')}
+                          </span>
+                        </td>
+                        <td>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-primary)', fontWeight: 500 }}>
+                            <span>{cat?.icon || '📦'}</span>
+                            <span>{cat?.name || t('uncategorized')}</span>
+                          </span>
+                        </td>
+                        <td style={{ fontStyle: tData.notes ? 'normal' : 'italic' }}>
+                          {tData.notes || t('noDescription')}
+                        </td>
+                        <td style={{ textAlign: 'right', fontWeight: 'bold', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                          {formatCurrency(tData.amount)}
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'center' }}>
+                            <button 
+                              className="btn btn-secondary" 
+                              style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', borderRadius: '6px' }}
+                              onClick={() => {
+                                handleEdit(tData);
+                                openLogger();
+                              }}
+                            >
+                              ✏️
+                            </button>
+                            <button 
+                              className="btn btn-danger" 
+                              style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', borderRadius: '6px', border: 'none' }}
+                              onClick={() => {
+                                showConfirm({
+                                  title: t('delete') + ' ' + t('ledgerBook'),
+                                  message: t('confirmDeleteTransaction'),
+                                  isDanger: true,
+                                  onConfirm: () => deleteTransaction(tData.id)
+                                });
+                              }}
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card Feed View */}
+            <div className="transaction-mobile-list">
+              {filteredTransactions.map(tData => {
+                const cat = categories.find(c => c.id === tData.categoryId);
+                return (
+                  <div key={tData.id} className="transaction-mobile-card">
+                    <div className="transaction-mobile-left">
+                      <div 
+                        className="transaction-mobile-icon-circle"
+                        style={{ 
+                          boxShadow: cat?.color ? `0 0 12px ${cat.color}25` : 'none',
+                          border: cat?.color ? `1px solid ${cat.color}40` : '1px solid var(--glass-border)'
+                        }}
+                      >
+                        {cat?.icon || '📦'}
+                      </div>
+                      <div className="transaction-mobile-details">
+                        <div className="transaction-mobile-category">
                           <span>{cat?.name || t('uncategorized')}</span>
-                        </span>
-                      </td>
-                      <td style={{ fontStyle: tData.notes ? 'normal' : 'italic' }}>
-                        {tData.notes || t('noDescription')}
-                      </td>
-                      <td style={{ textAlign: 'right', fontWeight: 'bold', fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                        {formatCurrency(tData.amount)}
-                      </td>
-                      <td style={{ textAlign: 'center' }}>
-                        <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'center' }}>
-                          <button 
-                            className="btn btn-secondary" 
-                            style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', borderRadius: '6px' }}
-                            onClick={() => {
-                              handleEdit(tData);
-                              openLogger();
-                            }}
-                          >
-                            ✏️
-                          </button>
-                          <button 
-                            className="btn btn-danger" 
-                            style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', borderRadius: '6px', border: 'none' }}
-                            onClick={() => {
-                              showConfirm({
-                                title: t('delete') + ' ' + t('ledgerBook'),
-                                message: t('confirmDeleteTransaction'),
-                                isDanger: true,
-                                onConfirm: () => deleteTransaction(tData.id)
-                              });
-                            }}
-                          >
-                            🗑️
-                          </button>
                         </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{tData.date}</span>
+                          <span className={`spender-badge ${tData.spender}`} style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
+                            {tData.spender === 'me' ? t('husband') : tData.spender === 'spouse' ? t('wife') : t('familyView')}
+                          </span>
+                        </div>
+                        <div className="transaction-mobile-notes" style={{ fontStyle: tData.notes ? 'normal' : 'italic' }}>
+                          {tData.notes || t('noDescription')}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="transaction-mobile-right">
+                      <div className="transaction-mobile-amount">
+                        {formatCurrency(tData.amount)}
+                      </div>
+                      <div className="transaction-mobile-actions">
+                        <button 
+                          className="btn btn-secondary" 
+                          style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem', borderRadius: '6px' }}
+                          onClick={() => {
+                            handleEdit(tData);
+                            openLogger();
+                          }}
+                        >
+                          ✏️
+                        </button>
+                        <button 
+                          className="btn btn-danger" 
+                          style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem', borderRadius: '6px', border: 'none' }}
+                          onClick={() => {
+                            showConfirm({
+                              title: t('delete') + ' ' + t('ledgerBook'),
+                              message: t('confirmDeleteTransaction'),
+                              isDanger: true,
+                              onConfirm: () => deleteTransaction(tData.id)
+                            });
+                          }}
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
 

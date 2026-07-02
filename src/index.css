@@ -236,6 +236,10 @@ h1, h2, h3, h4, h5, h6 {
   gap: 0.5rem;
 }
 
+.close-sidebar-btn {
+  display: none;
+}
+
 .sidebar-menu {
   list-style: none;
   display: flex;
@@ -529,6 +533,16 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 2.5rem;
 }
 
+.dashboard-layout-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+}
+
+.categories-layout-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr;
+}
+
 /* Income Allocation Donut helper (made with pure SVG, styled with css) */
 .donut-svg {
   transform: rotate(-90deg);
@@ -590,3 +604,246 @@ h1, h2, h3, h4, h5, h6 {
 .transaction-table tr:last-child td {
   border-bottom: none;
 }
+
+/* ==========================================================================
+   Responsive Mobile View Adjustments (< 768px)
+   ========================================================================== */
+.mobile-top-bar {
+  display: none;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-obsidian-card);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 0.85rem 1.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  width: 100%;
+}
+
+.hamburger-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 6px;
+  transition: var(--transition-smooth);
+}
+
+.hamburger-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mobile-brand-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.02em;
+  background: linear-gradient(135deg, var(--text-primary) 30%, var(--text-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(5, 7, 16, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 998;
+  animation: fadeInOverlay 0.3s ease;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Transactions Mobile Card Styles */
+.transaction-mobile-list {
+  display: none;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.transaction-mobile-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 1rem;
+  transition: var(--transition-smooth);
+}
+
+.transaction-mobile-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-focus);
+  transform: translateY(-2px);
+}
+
+.transaction-mobile-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.transaction-mobile-icon-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  flex-shrink: 0;
+}
+
+.transaction-mobile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.transaction-mobile-category {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.transaction-mobile-notes {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.transaction-mobile-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  margin-left: 1rem;
+  flex-shrink: 0;
+}
+
+.transaction-mobile-amount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.transaction-mobile-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Media Query for Screens < 900px */
+@media (max-width: 900px) {
+  .app-container {
+    flex-direction: column !important;
+  }
+
+  .mobile-top-bar {
+    display: flex !important;
+  }
+
+  .sidebar {
+    display: flex !important;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 290px !important;
+    height: 100vh !important;
+    z-index: 999 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border-right: 1px solid var(--glass-border) !important;
+    border-radius: 0 !important;
+    background: rgba(16, 22, 42, 0.98) !important;
+    backdrop-filter: blur(25px) !important;
+  }
+
+  .sidebar.open {
+    transform: translateX(0) !important;
+  }
+
+  .main-content {
+    padding: 1rem !important;
+    width: 100% !important;
+  }
+
+  /* Transactions table hide, show mobile card feed */
+  .transaction-table-wrapper {
+    display: none !important;
+  }
+
+  .transaction-mobile-list {
+    display: flex !important;
+  }
+
+  /* Dashboard grids stack single column */
+  .dashboard-metrics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .dashboard-layout-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Categories builder grids stack */
+  .categories-layout-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .settings-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .glass-panel {
+    padding: 1.25rem !important;
+  }
+
+  .sidebar-brand {
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+
+  .close-sidebar-btn {
+    display: block !important;
+    background: none !important;
+    border: none !important;
+    font-size: 1.5rem !important;
+    color: var(--text-secondary) !important;
+    cursor: pointer !important;
+    transition: var(--transition-smooth) !important;
+    line-height: 1 !important;
+    padding: 0.25rem !important;
+  }
+
+  .close-sidebar-btn:hover {
+    color: var(--text-primary) !important;
+  }
+}
+

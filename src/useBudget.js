@@ -141,8 +141,21 @@ const TRANSLATIONS = {
     noDescription: 'No description',
     uncategorized: 'Uncategorized',
     plannedLimit: 'Planned limit',
-    actualSpend: 'Actual spend',
-    currencyDisclaimer: 'If switching currencies, reload demo data under History to scale mock metrics!'
+    currencyDisclaimer: 'If switching currencies, reload demo data under History to scale mock metrics!',
+    howIsThisCalculated: 'How is this calculated?',
+    calcExplanationTitle: '📊 Projection & Pacing Calculations',
+    calcExplanationIntro: 'This platform uses live, smart algorithms to help you keep track of your spending patterns and alert you if you are spending too fast.',
+    calcProjTitle: '1. Projected Month-End (Proyeksi Akhir Bulan)',
+    calcProjFormula: 'Formula: (Total Spent / Days Elapsed) × Total Days in Cycle',
+    calcProjDesc: 'Your budget cycle runs from the 25th to the 24th (30-31 days). The system takes your average daily spending and multiplies it by the total days in the cycle to estimate your month-end total.',
+    calcFixedExAnomaly: '💡 The Fixed Expense Anomaly:',
+    calcFixedExAnomalyDesc: 'If you pay a large fixed bill once a month at the start of your cycle (like Rent/Kost), the system initially assumes you will spend that same amount every single day, causing the projection to inflate temporarily. Don\'t worry! As more days pass, your daily average will dilute and the projection will automatically normalize.',
+    calcPacingTitle: '2. Overpace Warning (Pengeluaran Terlalu Cepat!)',
+    calcPacingFormula: 'Trigger: Spent % > Elapsed Days % + 5%',
+    calcPacingDesc: 'We compare the percentage of budget you have spent against the percentage of time that has passed in your billing cycle. If your spending speed is significantly ahead of the calendar progress, we show a helpful warning so you can adjust your pace.',
+    calcPacingFriendlyTip: '🛡️ Friendly Tip:',
+    calcPacingFriendlyTipDesc: 'If you have large upfront expenses, the warning is expected and normal. It will transition back to a healthy green status as long as your daily variable spending remains stable over the coming days.',
+    closeBtn: 'Close'
   },
   id: {
     dashboard: 'Dashboard',
@@ -281,9 +294,22 @@ const TRANSLATIONS = {
     confirmDeleteTransaction: 'Apakah Anda yakin ingin menghapus pengeluaran ini?',
     noDescription: 'Tanpa deskripsi',
     uncategorized: 'Belum Dikategorikan',
-    plannedLimit: 'Batas direncanakan',
     actualSpend: 'Pengeluaran aktual',
-    currencyDisclaimer: 'Jika berpindah mata uang, muat ulang data demo di Riwayat untuk menyesuaikan metrik!'
+    currencyDisclaimer: 'Jika berpindah mata uang, muat ulang data demo di Riwayat untuk menyesuaikan metrik!',
+    howIsThisCalculated: 'Bagaimana ini dihitung?',
+    calcExplanationTitle: '📊 Perhitungan Proyeksi & Laju Pengeluaran',
+    calcExplanationIntro: 'Platform ini menggunakan algoritma langsung yang cerdas untuk membantu Anda memantau pola pengeluaran dan memberikan peringatan jika Anda membelanjakan uang terlalu cepat.',
+    calcProjTitle: '1. Proyeksi Akhir Bulan',
+    calcProjFormula: 'Rumus: (Total Pengeluaran / Hari Berlalu) × Total Hari Siklus',
+    calcProjDesc: 'Siklus anggaran Anda berjalan dari tanggal 25 hingga tanggal 24 (30-31 hari). Sistem mengambil rata-rata pengeluaran harian Anda dan mengalikannya dengan total hari dalam siklus untuk mengestimasi total pengeluaran di akhir bulan.',
+    calcFixedExAnomaly: '💡 Anomali Pengeluaran Tetap:',
+    calcFixedExAnomalyDesc: 'Jika Anda membayar tagihan tetap besar sekali sebulan di awal siklus (seperti sewa/Kost), sistem sementara waktu mengasumsikan Anda akan mengeluarkan jumlah yang sama setiap hari, sehingga proyeksi melonjak naik. Jangan khawatir! Seiring bertambahnya hari, rata-rata harian Anda akan mengecil secara alami dan proyeksi akan normal kembali.',
+    calcPacingTitle: '2. Peringatan Pengeluaran Terlalu Cepat!',
+    calcPacingFormula: 'Pemicu: % Pengeluaran > % Hari Berlalu + 5%',
+    calcPacingDesc: 'Kami membandingkan persentase anggaran yang telah Anda gunakan dengan persentase waktu yang telah berjalan dalam siklus tagihan Anda. Jika kecepatan belanja Anda jauh mendahului kemajuan kalender, kami menampilkan peringatan yang membantu agar Anda dapat menyesuaikan laju belanja.',
+    calcPacingFriendlyTip: '🛡️ Tip Ramah:',
+    calcPacingFriendlyTipDesc: 'Jika Anda memiliki pengeluaran besar di awal, peringatan ini adalah hal yang wajar dan normal. Status akan kembali hijau sehat seiring waktu selama pengeluaran harian Anda tetap stabil dalam beberapa hari ke depan.',
+    closeBtn: 'Tutup'
   }
 };
 

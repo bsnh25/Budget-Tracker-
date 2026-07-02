@@ -12,6 +12,7 @@ function App() {
   const budget = useBudget();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isLoggerOpen, setIsLoggerOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   if (budget.isAuthLoading) {
     return (
@@ -95,46 +96,64 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Mobile top-bar header */}
+      <div className="mobile-top-bar">
+        <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>
+          ☰
+        </button>
+        <span className="mobile-brand-title">🌌 KiaBiyu Budget</span>
+      </div>
+
+      {/* Sidebar Overlay Backdrop */}
+      {isSidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
       {/* 1. Sticky Navigation Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div>
           <div className="sidebar-brand">
-            <span style={{ fontSize: '1.8rem' }}>🌌</span>
-            <span>KiaBiyu Budget Tracker</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '1.8rem' }}>🌌</span>
+              <span>KiaBiyu Budget Tracker</span>
+            </div>
+            <button className="close-sidebar-btn" onClick={() => setIsSidebarOpen(false)}>
+              &times;
+            </button>
           </div>
 
           <ul className="sidebar-menu">
             <li 
               className={`sidebar-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setActiveTab('dashboard')}
+              onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }}
             >
               <span style={{ fontSize: '1.2rem' }}>📊</span>
               <span>{budget.t('dashboard')}</span>
             </li>
             <li 
               className={`sidebar-item ${activeTab === 'transactions' ? 'active' : ''}`}
-              onClick={() => setActiveTab('transactions')}
+              onClick={() => { setActiveTab('transactions'); setIsSidebarOpen(false); }}
             >
               <span style={{ fontSize: '1.2rem' }}>🧾</span>
               <span>{budget.t('ledgerBook')}</span>
             </li>
             <li 
               className={`sidebar-item ${activeTab === 'categories' ? 'active' : ''}`}
-              onClick={() => setActiveTab('categories')}
+              onClick={() => { setActiveTab('categories'); setIsSidebarOpen(false); }}
             >
               <span style={{ fontSize: '1.2rem' }}>🏷️</span>
               <span>{budget.t('categoryPlanner')}</span>
             </li>
             <li 
               className={`sidebar-item ${activeTab === 'history' ? 'active' : ''}`}
-              onClick={() => setActiveTab('history')}
+              onClick={() => { setActiveTab('history'); setIsSidebarOpen(false); }}
             >
               <span style={{ fontSize: '1.2rem' }}>📈</span>
               <span>{budget.t('historyRollovers')}</span>
             </li>
             <li 
               className={`sidebar-item ${activeTab === 'settings' ? 'active' : ''}`}
-              onClick={() => setActiveTab('settings')}
+              onClick={() => { setActiveTab('settings'); setIsSidebarOpen(false); }}
             >
               <span style={{ fontSize: '1.2rem' }}>⚙️</span>
               <span>{budget.language === 'id' ? 'Pengaturan' : 'Settings'}</span>
