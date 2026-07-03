@@ -12,7 +12,6 @@ export default function Dashboard({ budget, openLogger }: DashboardProps) {
     dateMetrics, 
     budgetMetrics, 
     monthlyIncome, 
-    activeProfile,
     t,
     formatCurrency
   } = budget;

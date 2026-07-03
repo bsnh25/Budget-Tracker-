@@ -23,8 +23,7 @@ export default function Settings({ budget }: SettingsProps) {
     importData,
     resetToFresh,
     theme,
-    toggleTheme,
-    t
+    toggleTheme
   } = budget;
 
   // Formatting date string nicely for the user (e.g. 2026-06-25 to 25 Juni 2026)

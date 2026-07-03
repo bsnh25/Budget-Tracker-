@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useBudgetController } from '../controllers/useBudgetController';
-import { HistorySnapshot } from '../types';
+
 
 interface HistoryProps {
   budget: ReturnType<typeof useBudgetController>;

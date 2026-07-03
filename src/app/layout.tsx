@@ -1,11 +1,18 @@
-import type { Metadata } from 'next';
+/* eslint-disable react/only-export-components */
+import type { Metadata, Viewport } from 'next';
 import '../index.css';
 
 export const metadata: Metadata = {
   title: 'KiaBiyu Budget Tracker',
   description: 'Smart family and personal budgeting tracker with real-time sync and vacation/traveling multi-currency planner.',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 };
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 
 export default function RootLayout({
   children,

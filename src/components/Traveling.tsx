@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Transaction, Category, Trip, TripCategory } from '../types';
+import { Transaction, Category, Trip } from '../types';
 
 interface TravelingProps {
   budget: {
@@ -73,7 +73,6 @@ export default function Traveling({ budget }: TravelingProps) {
 
   // Find active trip object safely
   const activeTrip = trips.find(t => t.id === activeTripId && !t.archived) || null;
-  const archivedTrips = trips.filter(t => t.archived) || [];
 
   // Set default logging date within trip duration when expense logger is opened
   useEffect(() => {
@@ -208,7 +207,7 @@ export default function Traveling({ budget }: TravelingProps) {
         minimumFractionDigits: currencyCode === 'JPY' || currencyCode === 'KRW' ? 0 : 2,
         maximumFractionDigits: currencyCode === 'JPY' || currencyCode === 'KRW' ? 0 : 2,
       }).format(foreignAmount);
-    } catch (e) {
+    } catch {
       formattedAmount = `${currencyCode} ${foreignAmount.toLocaleString(language === 'id' ? 'id-ID' : 'en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
