@@ -47,3 +47,6 @@ credentials/
 service-account*.json
 service_account*.json
 
+
+.next
+.next/

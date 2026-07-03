@@ -1,9 +1,15 @@
 import React, { useState, useMemo } from 'react';
+import { useBudgetController } from '../controllers/useBudgetController';
+import { Category } from '../types';
 
 const PRESET_ICONS = ['🏠', '🛒', '⚡', '🚗', '🍔', '🎬', '🛍️', '✈️', '🛡️', '📈', '🧸', '💊', '🎓', '🐾', '💈', '☕', '🎁', '💐'];
 const PRESET_COLORS = ['#ec4899', '#f43f5e', '#eab308', '#a855f7', '#3b82f6', '#06b6d4', '#14b8a6', '#f97316', '#10b981', '#059669', '#6366f1', '#64748b'];
 
-export default function Categories({ budget }) {
+interface CategoriesProps {
+  budget: ReturnType<typeof useBudgetController>;
+}
+
+export default function Categories({ budget }: CategoriesProps) {
   const { 
     categories, 
     monthlyIncome, 
@@ -18,10 +24,10 @@ export default function Categories({ budget }) {
 
   // Local Category Builder modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   
   const [formName, setFormName] = useState('');
-  const [formType, setFormType] = useState('need');
+  const [formType, setFormType] = useState<'need' | 'want' | 'saving'>('need');
   const [formLimit, setFormLimit] = useState('');
   const [formColor, setFormColor] = useState('#a855f7');
   const [formIcon, setFormIcon] = useState('🏠');
@@ -77,10 +83,10 @@ export default function Categories({ budget }) {
   };
 
   // Open modal for editing category
-  const handleOpenEdit = (c) => {
+  const handleOpenEdit = (c: Category) => {
     setEditingCategory(c);
     setFormName(c.name);
-    setFormType(c.type);
+    setFormType(c.type as 'need' | 'want' | 'saving');
     setFormLimit(c.limit.toString());
     setFormColor(c.color);
     setFormIcon(c.icon);
@@ -88,18 +94,18 @@ export default function Categories({ budget }) {
   };
 
   // Submit category form
-  const handleCategorySubmit = (e) => {
+  const handleCategorySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim()) {
       alert(t('categoryEnvelopeName'));
       return;
     }
-    if (!formLimit || isNaN(formLimit) || parseFloat(formLimit) < 0) {
+    if (!formLimit || isNaN(Number(formLimit)) || parseFloat(formLimit) < 0) {
       alert(t('clearFiltersSearch'));
       return;
     }
 
-    const catData = {
+    const catData: Partial<Category> = {
       id: editingCategory ? editingCategory.id : undefined,
       name: formName.trim(),
       type: formType,
@@ -113,7 +119,7 @@ export default function Categories({ budget }) {
   };
 
   // Income save
-  const handleSaveIncome = (e) => {
+  const handleSaveIncome = (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = parseFloat(incomeInput);
     if (!isNaN(parsed) && parsed >= 0) {
@@ -184,7 +190,7 @@ export default function Categories({ budget }) {
       <div className="categories-layout-grid" style={{ gap: '1.5rem', marginBottom: '2rem' }}>
         
         {/* Income Settings Panel */}
-        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', justifyGap: 'space-between' }}>
+        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <h3 style={{ fontSize: '1.15rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <span>💰</span> {t('jointMonthlyIncome')}

@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useBudgetController } from '../controllers/useBudgetController';
+import { HistorySnapshot } from '../types';
 
-export default function History({ budget }) {
+interface HistoryProps {
+  budget: ReturnType<typeof useBudgetController>;
+}
+
+export default function History({ budget }: HistoryProps) {
   const { 
     history, 
     currentMonth, 
     startNewMonth, 
-    injectDemoData, 
     resetToFresh,
     t,
     formatCurrency,
-    currency,
     showConfirm
   } = budget;
 
@@ -18,7 +22,7 @@ export default function History({ budget }) {
   
   // Rollover wizard state
   const [isRolloverOpen, setIsRolloverOpen] = useState(false);
-  const [rolloverChoice, setRolloverChoice] = useState('rollover'); // 'rollover' | 'fresh'
+  const [rolloverChoice, setRolloverChoice] = useState<'rollover' | 'fresh'>('rollover');
 
   // If viewing a historical snapshot
   const activeHistorySnapshot = history.find(h => h.monthId === selectedPastMonth);
@@ -28,25 +32,24 @@ export default function History({ budget }) {
 
   // Calculations for custom SVG Chart
   const chartHeight = 150;
-  const chartWidth = 400;
   const barWidth = 25;
   const gap = 45;
 
   // Find max value in snapshots to scale bars correctly
   const maxVal = Math.max(
     ...chartData.map(h => {
-      const plannedSum = h.categories.reduce((sum, c) => sum + (c.totalLimit || c.limit), 0);
-      const spentSum = h.categories.reduce((sum, c) => sum + c.spent, 0);
+      const plannedSum = h.categories.reduce((sum, c) => sum + ((c.totalLimit !== undefined ? c.totalLimit : c.limit) || 0), 0);
+      const spentSum = h.categories.reduce((sum, c) => sum + (c.spent || 0), 0);
       return Math.max(plannedSum, spentSum);
     }),
     5000 // default minimum ceiling
   ) * 1.1; // 10% headroom
 
-  const handleStartNewMonthSubmit = (e) => {
+  const handleStartNewMonthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     startNewMonth(rolloverChoice);
     setIsRolloverOpen(false);
-    alert(t('rolloverCompletedSuccess').replace('{month}', currentMonth));
+    alert(t('rolloverCompletedSuccess') || `Rollover complete! Successfully transitioned to the next month.`);
   };
 
   return (
@@ -61,19 +64,6 @@ export default function History({ budget }) {
         </div>
         
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button 
-            className="btn btn-secondary" 
-            onClick={() => { 
-              showConfirm({
-                title: t('loadDemoData'),
-                message: t('confirmLoadDemo'),
-                isDanger: false,
-                onConfirm: () => injectDemoData()
-              }); 
-            }}
-          >
-            🔄 {t('loadDemoData')}
-          </button>
           <button 
             className="btn btn-danger" 
             style={{ border: 'none' }} 
@@ -141,8 +131,8 @@ export default function History({ budget }) {
                   const x = 80 + idx * (barWidth * 2 + gap);
                   
                   // Compute sums
-                  const totalPlanned = month.categories.reduce((sum, c) => sum + (c.totalLimit || c.limit), 0);
-                  const totalSpent = month.categories.reduce((sum, c) => sum + c.spent, 0);
+                  const totalPlanned = month.categories.reduce((sum, c) => sum + ((c.totalLimit !== undefined ? c.totalLimit : c.limit) || 0), 0);
+                  const totalSpent = month.categories.reduce((sum, c) => sum + (c.spent || 0), 0);
 
                   // Heights
                   const plannedHeight = (totalPlanned / maxVal) * chartHeight;
@@ -177,7 +167,7 @@ export default function History({ budget }) {
                         rx="4"
                         style={{ cursor: 'pointer', transition: 'var(--transition-smooth)' }}
                       >
-                        <title>{`${t('actualSpend')}: ${formatCurrency(totalSpent)}`}</title>
+                        <title>{`${t('actualSpent')}: ${formatCurrency(totalSpent)}`}</title>
                       </rect>
 
                       {/* Month Label */}
@@ -258,14 +248,14 @@ export default function History({ budget }) {
               <div className="glass-panel" style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('snapshotBudgetLimit')}</span>
                 <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
-                  {formatCurrency(activeHistorySnapshot.categories.reduce((sum, c) => sum + (c.totalLimit || c.limit), 0))}
+                  {formatCurrency(activeHistorySnapshot.categories.reduce((sum, c) => sum + ((c.totalLimit !== undefined ? c.totalLimit : c.limit) || 0), 0))}
                 </div>
               </div>
 
               <div className="glass-panel" style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('actualSnapshotSpent')}</span>
                 <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>
-                  {formatCurrency(activeHistorySnapshot.categories.reduce((sum, c) => sum + c.spent, 0))}
+                  {formatCurrency(activeHistorySnapshot.categories.reduce((sum, c) => sum + (c.spent || 0), 0))}
                 </div>
               </div>
 
@@ -276,8 +266,8 @@ export default function History({ budget }) {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
               {activeHistorySnapshot.categories.map(c => {
-                const limit = c.totalLimit || c.limit;
-                const pct = limit > 0 ? Math.round((c.spent / limit) * 100) : 0;
+                const limit = c.totalLimit !== undefined ? c.totalLimit : c.limit;
+                const pct = limit > 0 ? Math.round(((c.spent || 0) / limit) * 100) : 0;
                 return (
                   <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'rgba(255,255,255,0.01)', padding: '0.65rem 1rem', borderRadius: '8px', border: '1px solid var(--glass-border)', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '1.25rem' }}>{c.icon || '📦'}</span>
@@ -292,14 +282,14 @@ export default function History({ budget }) {
                         style={{ 
                           height: '100%', 
                           width: `${Math.min(pct, 100)}%`, 
-                          backgroundColor: c.spent > limit ? 'var(--color-danger)' : 'var(--color-success)', 
+                          backgroundColor: (c.spent || 0) > limit ? 'var(--color-danger)' : 'var(--color-success)', 
                           borderRadius: '99px' 
                         }} 
                       />
                     </div>
 
                     <span style={{ fontSize: '0.85rem', fontWeight: 'bold', minWidth: '180px', textAlign: 'right' }}>
-                      {formatCurrency(c.spent)} / {formatCurrency(limit)} ({pct}%)
+                      {formatCurrency(c.spent || 0)} / {formatCurrency(limit)} ({pct}%)
                     </span>
                   </div>
                 );

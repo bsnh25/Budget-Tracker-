@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
+import { useBudgetController } from '../controllers/useBudgetController';
 
-export default function Dashboard({ budget, openLogger }) {
+interface DashboardProps {
+  budget: ReturnType<typeof useBudgetController>;
+  openLogger: () => void;
+}
+
+export default function Dashboard({ budget, openLogger }: DashboardProps) {
   const [showExplanation, setShowExplanation] = useState(false);
   const { 
     dateMetrics, 
@@ -78,8 +84,8 @@ export default function Dashboard({ budget, openLogger }) {
               {totalSpent > totalPlannedLimit
                 ? `${t('budgetExceeded')} ${formatCurrency(totalSpent)} / ${formatCurrency(totalPlannedLimit)}.`
                 : isOverpace
-                ? `${t('pacingWarning')} ${t('elapsed')} ${elapsedPercent}%, spent ${Math.round((totalSpent / totalPlannedLimit) * 100)}%.`
-                : `${t('spendingOnTrack')} ${formatCurrency(totalSpent)} (${Math.round((totalSpent / totalPlannedLimit) * 100)}%) ${t('ofJointIncome')}.`}
+                ? `${t('pacingWarning')} ${t('elapsed')} ${elapsedPercent}%, spent ${Math.round((totalSpent / (totalPlannedLimit || 1)) * 100)}%.`
+                : `${t('spendingOnTrack')} ${formatCurrency(totalSpent)} (${Math.round((totalSpent / (totalPlannedLimit || 1)) * 100)}%) ${t('ofJointIncome')}.`}
             </p>
             <button 
               onClick={() => setShowExplanation(true)} 
@@ -155,7 +161,7 @@ export default function Dashboard({ budget, openLogger }) {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {enrichedCategories.map(c => {
-              const spentPercent = Math.round(c.spentRatio * 100);
+              const spentPercent = Math.round((c.spentRatio || 0) * 100);
               
               return (
                 <div key={c.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
@@ -163,17 +169,17 @@ export default function Dashboard({ budget, openLogger }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <span style={{ fontSize: '1.2rem' }}>{c.icon}</span>
                       <strong style={{ color: 'var(--text-primary)' }}>{c.name}</strong>
-                      {c.bonus > 0 && (
+                      {c.bonus && c.bonus > 0 ? (
                         <span style={{ fontSize: '0.75rem', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', padding: '1px 6px', borderRadius: '4px' }}>
                           +{formatCurrency(c.bonus)} rollover
                         </span>
-                      )}
+                      ) : null}
                     </div>
                     <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                      <span style={{ color: c.spent > c.totalLimit ? 'var(--color-danger)' : 'var(--text-primary)', fontWeight: 'bold' }}>
-                        {formatCurrency(c.spent)}
+                      <span style={{ color: (c.spent || 0) > (c.totalLimit || 0) ? 'var(--color-danger)' : 'var(--text-primary)', fontWeight: 'bold' }}>
+                        {formatCurrency(c.spent || 0)}
                       </span>
-                      <span> / {formatCurrency(c.totalLimit)}</span>
+                      <span> / {formatCurrency(c.totalLimit || 0)}</span>
                     </div>
                   </div>
 
@@ -203,12 +209,12 @@ export default function Dashboard({ budget, openLogger }) {
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                     <span>
-                      {c.spent > c.totalLimit 
-                        ? `Over by ${formatCurrency(c.spent - c.totalLimit)}` 
-                        : `${formatCurrency(c.totalLimit - c.spent)} ${t('remaining')}`}
+                      {(c.spent || 0) > (c.totalLimit || 0) 
+                        ? `Over by ${formatCurrency((c.spent || 0) - (c.totalLimit || 0))}` 
+                        : `${formatCurrency((c.totalLimit || 0) - (c.spent || 0))} ${t('remaining')}`}
                     </span>
                     <span>
-                      {spentPercent}% spent • Projected {formatCurrency(c.projectedSpend)}
+                      {spentPercent}% spent • Projected {formatCurrency(c.projectedSpend || 0)}
                     </span>
                   </div>
                 </div>
@@ -227,7 +233,7 @@ export default function Dashboard({ budget, openLogger }) {
             </h3>
             
             {['need', 'want', 'saving'].map(type => {
-              const metrics = groupMetrics[type];
+              const metrics = groupMetrics[type as 'need' | 'want' | 'saving'];
               const pct = metrics.planned > 0 ? Math.round((metrics.spent / metrics.planned) * 100) : 0;
               const typeLabel = type === 'need' ? `🏠 ${t('essentialNeeds')}` : type === 'want' ? `🍔 ${t('personalWants')}` : `🛡️ ${t('savingsGoalsInvestments')}`;
               const themeColor = type === 'need' ? 'var(--color-primary)' : type === 'want' ? 'var(--color-secondary)' : 'var(--color-joint)';
@@ -283,7 +289,7 @@ export default function Dashboard({ budget, openLogger }) {
                         {c.name} {c.pacingStatus === 'red' ? t('warningOverpace') : t('warningSlightlyAhead')}
                       </strong>
                       <span style={{ color: 'var(--text-secondary)' }}>
-                        Spent {Math.round(c.spentRatio * 100)}% ({formatCurrency(c.spent)}) against pace ({elapsedPercent}%). Projected {formatCurrency(c.projectedSpend)}.
+                        Spent {Math.round((c.spentRatio || 0) * 100)}% ({formatCurrency(c.spent || 0)}) against pace ({elapsedPercent}%). Projected {formatCurrency(c.projectedSpend || 0)}.
                       </span>
                     </div>
                   </div>

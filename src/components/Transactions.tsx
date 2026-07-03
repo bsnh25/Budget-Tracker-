@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
+import { useBudgetController } from '../controllers/useBudgetController';
+import { Transaction } from '../types';
 
-export default function Transactions({ budget, isLoggerOpen, openLogger, closeLogger }) {
+interface TransactionsProps {
+  budget: ReturnType<typeof useBudgetController>;
+  isLoggerOpen: boolean;
+  openLogger: () => void;
+  closeLogger: () => void;
+}
+
+export default function Transactions({ budget, isLoggerOpen, openLogger, closeLogger }: TransactionsProps) {
   const { 
     transactions, 
-    allMonthTransactions,
     categories, 
     activeProfile, 
-    selectProfile,
     saveTransaction, 
     deleteTransaction,
     currentMonth,
@@ -21,8 +28,8 @@ export default function Transactions({ budget, isLoggerOpen, openLogger, closeLo
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
 
   // Logger Form State (for adding / editing transactions)
-  const [editingTransaction, setEditingTransaction] = useState(null);
-  const [formSpender, setFormSpender] = useState('me');
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [formSpender, setFormSpender] = useState<'me' | 'spouse' | 'joint'>('me');
   const [formDate, setFormDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [formAmount, setFormAmount] = useState('');
   const [formCategory, setFormCategory] = useState(categories[0]?.id || '');
@@ -39,7 +46,7 @@ export default function Transactions({ budget, isLoggerOpen, openLogger, closeLo
   };
 
   // Handle edit transaction
-  const handleEdit = (tx) => {
+  const handleEdit = (tx: Transaction) => {
     setEditingTransaction(tx);
     setFormSpender(tx.spender);
     setFormDate(tx.date);
@@ -49,9 +56,9 @@ export default function Transactions({ budget, isLoggerOpen, openLogger, closeLo
   };
 
   // Submit Logger Form
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formAmount || isNaN(formAmount) || parseFloat(formAmount) <= 0) {
+    if (!formAmount || isNaN(Number(formAmount)) || parseFloat(formAmount) <= 0) {
       alert(t('clearFiltersSearch')); // custom alert fallback or simple validation
       return;
     }
@@ -60,7 +67,7 @@ export default function Transactions({ budget, isLoggerOpen, openLogger, closeLo
       return;
     }
 
-    const txData = {
+    const txData: Partial<Transaction> = {
       id: editingTransaction ? editingTransaction.id : undefined,
       date: formDate,
       amount: parseFloat(formAmount),
@@ -82,7 +89,7 @@ export default function Transactions({ budget, isLoggerOpen, openLogger, closeLo
   const filteredTransactions = transactions.filter(t => {
     const category = categories.find(c => c.id === t.categoryId);
     const categoryName = category ? category.name.toLowerCase() : '';
-    const notesMatch = t.notes.toLowerCase().includes(searchTerm.toLowerCase());
+    const notesMatch = (t.notes || '').toLowerCase().includes(searchTerm.toLowerCase());
     const categoryMatch = categoryName.includes(searchTerm.toLowerCase());
     const matchesSearch = notesMatch || categoryMatch;
 
@@ -122,8 +129,6 @@ export default function Transactions({ budget, isLoggerOpen, openLogger, closeLo
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-
-
 
         {/* Category Filter */}
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>

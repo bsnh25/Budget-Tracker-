@@ -9,7 +9,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleAuth = async (e) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -40,7 +40,7 @@ export default function Login() {
 
         if (signInError) throw signInError;
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       // Translate typical supabase error messages for Indonesian users
       let errMsg = err.message;

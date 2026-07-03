@@ -1,18 +1,22 @@
-import React, { useState } from 'react';
-import './App.css';
-import { useBudget } from './useBudget';
-import Dashboard from './components/Dashboard';
-import Transactions from './components/Transactions';
-import Categories from './components/Categories';
-import History from './components/History';
-import Login from './components/Login';
-import Settings from './components/Settings';
+'use client';
 
-function App() {
-  const budget = useBudget();
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [isLoggerOpen, setIsLoggerOpen] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+import React, { useState } from 'react';
+import { useBudgetController } from '../controllers/useBudgetController';
+import Dashboard from '../components/Dashboard';
+import Transactions from '../components/Transactions';
+import Categories from '../components/Categories';
+import History from '../components/History';
+import Login from '../components/Login';
+import Settings from '../components/Settings';
+import Traveling from '../components/Traveling';
+import { ErrorBoundary } from '../components/ErrorBoundary';
+
+export default function Home() {
+  const budget = useBudgetController();
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [isLoggerOpen, setIsLoggerOpen] = useState<boolean>(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const dialog = budget.confirmDialog;
 
   if (budget.isAuthLoading) {
     return (
@@ -152,6 +156,13 @@ function App() {
               <span>{budget.t('historyRollovers')}</span>
             </li>
             <li 
+              className={`sidebar-item ${activeTab === 'traveling' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('traveling'); setIsSidebarOpen(false); }}
+            >
+              <span style={{ fontSize: '1.2rem' }}>🧳</span>
+              <span>{budget.language === 'id' ? 'Mode Traveling' : 'Traveling Mode'}</span>
+            </li>
+            <li 
               className={`sidebar-item ${activeTab === 'settings' ? 'active' : ''}`}
               onClick={() => { setActiveTab('settings'); setIsSidebarOpen(false); }}
             >
@@ -184,7 +195,7 @@ function App() {
                   textOverflow: 'ellipsis',
                   overflow: 'hidden',
                   width: '100%'
-                }} title={budget.user?.email}>
+                }} title={budget.user?.email || ''}>
                   {budget.user?.email}
                 </span>
               </div>
@@ -206,15 +217,8 @@ function App() {
         </div>
       </aside>
 
-      {/* Mobile Top Navigation Header */}
-      <div className="mobile-header" style={{ display: 'none' }}>
-        {/* We can write small media query in CSS to show it. It's standard for layout polish */}
-      </div>
-
       {/* 2. Main Content View Router */}
       <main className="main-content">
-
-
         {/* View Switcher Routing */}
         {activeTab === 'dashboard' && (
           <Dashboard 
@@ -242,22 +246,27 @@ function App() {
         {activeTab === 'history' && (
           <History budget={budget} />
         )}
+
+        {activeTab === 'traveling' && (
+          <ErrorBoundary>
+            <Traveling budget={budget} />
+          </ErrorBoundary>
+        )}
         
         {activeTab === 'settings' && (
           <Settings budget={budget} />
         )}
-
       </main>
 
       {/* Global Glassmorphic Confirm Popup */}
-      {budget.confirmDialog && (
+      {dialog && (
         <div className="modal-overlay" style={{ zIndex: 2000 }}>
           <div className="modal-content" style={{ maxWidth: '420px', textAlign: 'center', border: '1px solid var(--glass-border-focus)' }}>
-            <h3 style={{ fontSize: '1.35rem', marginBottom: '1rem', fontFamily: 'Outfit', color: budget.confirmDialog.isDanger ? 'var(--color-danger)' : 'var(--text-primary)' }}>
-              {budget.confirmDialog.title || (budget.language === 'id' ? 'Konfirmasi Tindakan' : 'Confirm Action')}
+            <h3 style={{ fontSize: '1.35rem', marginBottom: '1rem', fontFamily: 'Outfit', color: dialog.isDanger ? 'var(--color-danger)' : 'var(--text-primary)' }}>
+              {dialog.title || (budget.language === 'id' ? 'Konfirmasi Tindakan' : 'Confirm Action')}
             </h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '1.75rem', lineHeight: '1.4' }}>
-              {budget.confirmDialog.message}
+              {dialog.message}
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
               <button 
@@ -265,17 +274,17 @@ function App() {
                 onClick={budget.closeConfirm}
                 style={{ padding: '0.5rem 1.5rem', fontSize: '0.85rem' }}
               >
-                {budget.confirmDialog.cancelText || budget.t('cancel')}
+                {dialog.cancelText || budget.t('cancel')}
               </button>
               <button 
-                className={budget.confirmDialog.isDanger ? 'btn btn-danger' : 'btn btn-primary'}
+                className={dialog.isDanger ? 'btn btn-danger' : 'btn btn-primary'}
                 onClick={() => {
-                  budget.confirmDialog.onConfirm();
+                  dialog.onConfirm();
                   budget.closeConfirm();
                 }}
                 style={{ padding: '0.5rem 1.5rem', fontSize: '0.85rem', border: 'none' }}
               >
-                {budget.confirmDialog.confirmText || (budget.confirmDialog.isDanger ? (budget.language === 'id' ? 'Hapus' : 'Delete') : (budget.language === 'id' ? 'Ya' : 'Confirm'))}
+                {dialog.confirmText || (dialog.isDanger ? (budget.language === 'id' ? 'Hapus' : 'Delete') : (budget.language === 'id' ? 'Ya' : 'Confirm'))}
               </button>
             </div>
           </div>
@@ -284,5 +293,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

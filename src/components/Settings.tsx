@@ -1,6 +1,13 @@
-import React from 'react';
+'use client';
 
-export default function Settings({ budget }) {
+import React from 'react';
+import { useBudgetController } from '../controllers/useBudgetController';
+
+interface SettingsProps {
+  budget: ReturnType<typeof useBudgetController>;
+}
+
+export default function Settings({ budget }: SettingsProps) {
   const {
     language,
     currency,
@@ -15,36 +22,36 @@ export default function Settings({ budget }) {
     exportData,
     importData,
     resetToFresh,
-    injectDemoData,
     theme,
     toggleTheme,
     t
   } = budget;
 
   // Formatting date string nicely for the user (e.g. 2026-06-25 to 25 Juni 2026)
-  const formatDatePretty = (dateStr) => {
+  const formatDatePretty = (dateStr: string) => {
     if (!dateStr) return '';
     const [y, m, d] = dateStr.split('-');
+    if (!y || !m || !d) return dateStr;
     const monthsId = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     const monthsEn = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const mIdx = parseInt(m) - 1;
+    const mIdx = parseInt(m, 10) - 1;
     const monthName = language === 'id' ? monthsId[mIdx] : monthsEn[mIdx];
-    return `${parseInt(d)} ${monthName} ${y}`;
+    return `${parseInt(d, 10)} ${monthName || ''} ${y}`;
   };
 
   const handleImportClick = () => {
     document.getElementById('settings-import-file-input')?.click();
   };
 
-  const handleImportFileChange = (e) => {
+  const handleImportFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       const content = event.target?.result;
       if (content && typeof content === 'string') {
-        const success = importData(content);
+        const success = await importData(content);
         if (success) {
           alert(language === 'id' ? 'Cadangan berhasil dipulihkan! Semua data disinkronkan.' : 'Backup restored successfully! All data accounts synced.');
         }
@@ -181,7 +188,7 @@ export default function Settings({ budget }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <select 
                     value={cycleStartDay} 
-                    onChange={(e) => selectCycleStartDay(parseInt(e.target.value))}
+                    onChange={(e) => selectCycleStartDay(parseInt(e.target.value, 10))}
                     className="form-control"
                     style={{ padding: '0.4rem 1.5rem 0.4rem 0.75rem', width: '110px', fontSize: '0.9rem', outline: 'none', cursor: 'pointer' }}
                   >
@@ -203,7 +210,7 @@ export default function Settings({ budget }) {
                   <div style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--color-primary-glow)' }}>
                     📅 {formatDatePretty(dateMetrics.startDate)} — {formatDatePretty(dateMetrics.endDate)}
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                     ⏱️ {language === 'id' ? `Durasi total: ${dateMetrics.totalDays} hari` : `Total duration: ${dateMetrics.totalDays} days`}
                   </div>
                 </div>
@@ -326,29 +333,10 @@ export default function Settings({ budget }) {
                 ⚠️ {language === 'id' ? 'Tindakan Berisiko / Reset Data' : 'Danger Zone / Destructive Actions'}
               </label>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <button 
                   className="btn btn-secondary" 
-                  style={{ padding: '0.65rem', fontSize: '0.8rem', justifyContent: 'center' }}
-                  onClick={() => {
-                    showConfirm({
-                      title: language === 'id' ? 'Muat Data Demo' : 'Load Demo Data',
-                      message: language === 'id' 
-                        ? 'Apakah Anda yakin ingin memuat ulang data tiruan 3 bulan lalu? Tindakan ini akan menimpa anggaran aktif Anda saat ini.' 
-                        : 'Are you sure you want to reload 3-months of preloaded demo data? This will overwrite your active budgets.',
-                      confirmText: language === 'id' ? 'Muat Demo' : 'Load Demo',
-                      cancelText: language === 'id' ? 'Batal' : 'Cancel',
-                      onConfirm: injectDemoData,
-                      isDanger: false
-                    });
-                  }}
-                >
-                  🎭 {language === 'id' ? 'Muat Data Simulasi' : 'Load Demo Data'}
-                </button>
-
-                <button 
-                  className="btn btn-secondary" 
-                  style={{ padding: '0.65rem', fontSize: '0.8rem', justifyContent: 'center', color: 'var(--color-danger)', border: '1px solid rgba(244, 63, 94, 0.15)' }}
+                  style={{ padding: '0.75rem', fontSize: '0.85rem', justifyContent: 'center', color: 'var(--color-danger)', border: '1px solid rgba(244, 63, 94, 0.15)', width: '100%' }}
                   onClick={() => {
                     showConfirm({
                       title: language === 'id' ? 'Reset Total Basis Data' : 'Reset Everything',
